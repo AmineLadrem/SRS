@@ -1,0 +1,16 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.adapterTargetName": "esp32c6",
+    "idf.customExtraPaths": "/home/amineladrem/.espressif/tools/xtensa-esp-elf-gdb/14.2_20240403/xtensa-esp-elf-gdb/bin:/home/amineladrem/.espressif/tools/riscv32-esp-elf-gdb/14.2_20240403/riscv32-esp-elf-gdb/bin:/home/amineladrem/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20230928/xtensa-esp-elf/bin:/home/amineladrem/.espressif/tools/riscv32-esp-elf/esp-13.2.0_20230928/riscv32-esp-elf/bin:/home/amineladrem/.espressif/tools/esp32ulp-elf/2.35_20220830/esp32ulp-elf/bin:/home/amineladrem/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/bin:/home/amineladrem/.espressif/tools/esp-rom-elfs/20230320",
+    "idf.customExtraVars": {
+        "OPENOCD_SCRIPTS": "/home/amineladrem/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/share/openocd/scripts",
+        "ESP_ROM_ELF_DIR": "/home/amineladrem/.espressif/tools/esp-rom-elfs/20230320/"
+    },
+    "idf.espIdfPath": "/home/amineladrem/esp/v5.2.2/esp-idf",
+    "idf.openOcdConfigs": [
+        "board/esp32c6-ftdi.cfg"
+    ],
+    "idf.port": "/dev/ttyS0",
+    "idf.pythonBinPath": "/home/amineladrem/.espressif/python_env/idf5.2_py3.12_env/bin/python",
+    "idf.toolsPath": "/home/amineladrem/.espressif"
+}

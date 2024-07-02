@@ -1,0 +1,156 @@
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_log.h"
+
+#include "functions.h"
+#include "led_control.h"
+#include "pins_control.h"
+#include "rfid_conf.h"
+#include "cards_control.h"
+#include "rtc_control.h"
+#include "wifi_control.h"
+#include "server_control.h"
+#include "lock_control.h"
+#include "spiffs_control.h"
+
+static const char *tag = "LockStatus";
+
+void sync_lock(){
+    int wifi_res = wifi_connection();
+    if (wifi_res == 0)
+    {
+        server_connection();
+        send_to_server("get_cards", "300");
+        vTaskDelay(pdMS_TO_TICKS(500));
+        send_log_to_server();
+    }
+    server_disconnection();
+    ESP_LOGI(tag, "Disconnected from the server");
+    wifi_disconnection();
+    ESP_LOGI(tag, "Disconnected from the Wi-Fi");
+}
+
+void app_main(void)
+{
+    uint8_t *data = 0;
+    int8_t counter;
+    time_t time;
+    int wifi_res;
+    int check_card_flag;
+
+    init_spiffs();
+    init_pins();
+    //check_rtc(); // pour sync le RTC
+
+    TickType_t start_time = xTaskGetTickCount();
+
+
+    while (check_capteur_state())
+    {
+
+        ESP_LOGI(tag, "Going to read the cards");
+        data = rfid_on();
+
+        if (data != NULL && check_rfid_data((const char *)data))
+        {
+            time = get_time();
+            check_card_flag = check_card((const char *)data);
+            read_cards();
+
+            if (check_card_flag == 0)
+            { // Valid Card
+                TURN_GREEN_LED();
+                open_lock();
+                card_passed_buzzer();
+                vTaskDelay(pdMS_TO_TICKS(5700));
+                close_lock();
+                TURN_OFF_LED();
+            }
+            else if (check_card_flag == 1 || check_card_flag == 2)
+            { // Blocked Card
+                TURN_RED_LED();
+                card_passed_buzzer();
+                vTaskDelay(pdMS_TO_TICKS(700));
+                TURN_OFF_LED();
+            }
+            add_log((const char *)data, (long)time);
+            read_log();
+
+            counter = decrement_counter();
+            printf("Counter = %" PRIu8 "\n", counter);
+
+            if (check_card_flag == 2)
+            {
+                wifi_res = wifi_connection();
+
+                if (wifi_res == 0)
+                {
+                    server_connection();
+                    send_to_server("get_cards", "300");
+                    vTaskDelay(pdMS_TO_TICKS(300));
+                    read_cards();
+
+                    check_card_flag = check_card((const char *)data);
+                    if (check_card_flag == 0)
+                    { // Valid Card
+                        TURN_GREEN_LED();
+                        open_lock();
+                        card_passed_buzzer();
+                        vTaskDelay(pdMS_TO_TICKS(2700));
+                        close_lock();
+                        TURN_OFF_LED();
+                    }
+                    else if (check_card_flag == 1 || check_card_flag == 2)
+                    { // Blocked Card
+                        TURN_RED_LED();
+                        card_passed_buzzer();
+                        vTaskDelay(pdMS_TO_TICKS(100));
+                        TURN_OFF_LED();
+                    }
+                    if (check_card_flag == 2)
+                    { // Invalid Card
+                        TURN_RED_LED();
+                        vTaskDelay(pdMS_TO_TICKS(200));
+                        TURN_OFF_LED();
+                        vTaskDelay(pdMS_TO_TICKS(200));
+                        TURN_RED_LED();
+                        vTaskDelay(pdMS_TO_TICKS(200));
+                        TURN_OFF_LED();
+                        add_card((const char *)data, time, time, 1, 0, 0);
+                    }
+
+                    add_log((const char *)data, (long)time);
+                }
+                else
+                {
+                    ESP_LOGI(tag, "Wifi is Not Connected");
+                }
+
+                send_log_to_server();
+                server_disconnection();
+                ESP_LOGI(tag, "Disconnected from the server");
+                wifi_disconnection();
+                ESP_LOGI(tag, "Disconnected from the Wi-Fi");
+            }
+        }
+        else
+        {
+            ESP_LOGI(tag, "No RFID data found or invalid");
+        }
+
+        // Reset data to NULL to ensure the next loop iteration calls rfid_on() again.
+        data = NULL;
+    }
+    sync_lock();
+
+    TickType_t end_time = xTaskGetTickCount();
+    TickType_t elapsed_time = end_time - start_time;
+    float time_milliseconds = ((float)elapsed_time * 1000) / configTICK_RATE_HZ;
+    ESP_LOGI(TAG, "Time taken: %.2f milliseconds", time_milliseconds);
+
+    rfid_off();
+    deinit_pins();
+    lock_deep_sleep_2();
+}

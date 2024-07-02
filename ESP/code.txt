@@ -1,0 +1,309 @@
+#ifndef WIFI_CONTROL_H
+#define WIFI_CONTROL_H
+
+#include <stdio.h>
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_log.h"
+#include "esp_event.h"
+#include "nvs_flash.h"
+#include "lwip/err.h"
+#include "lwip/sys.h"
+#include "esp_spiffs.h"
+#include "lwip/ip_addr.h" // Include the lwIP header for ipaddr_addr()
+#include <netdb.h>
+
+// Declare esp_netif_sta variable
+esp_netif_t *esp_netif_sta;
+
+char ssid[32];
+char pass[64];
+int retry_num = 0;
+int wifi_connected = 0;
+
+static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+{
+    if (event_id == WIFI_EVENT_STA_START)
+    {
+        printf("WIFI CONNECTING....\n");
+    }
+    else if (event_id == WIFI_EVENT_STA_CONNECTED)
+    {
+        printf("WiFi CONNECTED\n");
+    }
+    else if (event_id == WIFI_EVENT_STA_DISCONNECTED)
+    {
+        printf("WiFi lost connection\n");
+        if (retry_num < 5)
+        {
+            esp_wifi_connect();
+            retry_num++;
+            printf("Retrying to Connect...\n");
+        }
+    }
+    else if (event_id == IP_EVENT_STA_GOT_IP)
+    {
+        printf("Wifi got IP...\n\n");
+        wifi_connected = 1;
+    }
+}
+
+int wifi_connection()
+{
+
+    char temp_ssid[32];
+    char temp_pass[64];
+    char temp_ip[16]; // Assuming IPv4 address format
+    char temp_gtw[16];
+    char temp_msk[16];
+    char temp_dns[16];
+
+    FILE *fp = fopen("/lock_data/lock_params.txt", "r");
+    if (fp == NULL)
+    {
+        printf("Failed to open file for reading\n");
+        return -1;
+    }
+    char line[100];
+    while (fgets(line, sizeof(line), fp))
+    {
+        if (strstr(line, "ssid") != NULL)
+        {
+            sscanf(line, "ssid='%[^']'", temp_ssid);
+        }
+        else if (strstr(line, "pw") != NULL)
+        {
+            sscanf(line, "pw='%[^']'", temp_pass);
+        }
+        else if (strstr(line, "ip") != NULL)
+        {
+            sscanf(line, "ip='%[^']'", temp_ip);
+        }
+        else if (strstr(line, "gtw") != NULL)
+        {
+            sscanf(line, "gtw='%[^']'", temp_gtw);
+        }
+        else if (strstr(line, "msk") != NULL)
+        {
+            sscanf(line, "msk='%[^']'", temp_msk);
+        }
+        else if (strstr(line, "dns") != NULL)
+        {
+            sscanf(line, "dns='%[^']'", temp_dns);
+        }
+    }
+    fclose(fp);
+
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    esp_netif_t *esp_netif_sta = esp_netif_create_default_wifi_sta();
+
+    esp_netif_dhcpc_stop(esp_netif_sta);
+
+    wifi_init_config_t wifi_initiation = WIFI_INIT_CONFIG_DEFAULT();
+    esp_wifi_init(&wifi_initiation);
+    esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event_handler, NULL);
+
+    wifi_config_t wifi_configuration = {
+        .sta = {
+            .ssid = "",
+            .password = "",
+        },
+    };
+
+    strcpy(ssid, temp_ssid);
+    strcpy(pass, temp_pass);
+
+    strcpy((char *)wifi_configuration.sta.ssid, ssid);
+    strcpy((char *)wifi_configuration.sta.password, pass);
+    printf("%s\n", (char *)wifi_configuration.sta.ssid);
+    printf("%s\n", (char *)wifi_configuration.sta.password);
+
+    esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_configuration);
+
+    // Set static IP configuration
+    esp_netif_ip_info_t ip_info;
+    ip_info.ip.addr = ipaddr_addr(temp_ip);
+    ip_info.netmask.addr = ipaddr_addr(temp_gtw);
+    ip_info.gw.addr = ipaddr_addr(temp_msk);
+    esp_netif_set_ip_info(esp_netif_sta, &ip_info); // Set static IP info
+    esp_netif_dns_info_t dns_info;
+
+    // Convert DNS IPv4 address string to ip_addr_t
+    ip_addr_t dns_addr;
+    if (inet_pton(AF_INET, temp_dns, &dns_addr) <= 0)
+    {
+        printf("Invalid DNS IPv4 address\n");
+        // Handle error
+    }
+
+    // Set DNS server address
+    dns_info.ip.u_addr.ip4.addr = dns_addr.u_addr.ip4.addr;
+
+    esp_wifi_start();
+    esp_wifi_set_mode(WIFI_MODE_STA);
+
+    esp_wifi_connect();
+
+    while (!wifi_connected)
+    {
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+
+    return 0;
+}
+
+void wifi_disconnection()
+{
+    esp_wifi_disconnect();
+    esp_wifi_stop();
+    esp_wifi_deinit();
+}
+
+#endif /* WIFI_CONTROL_H */
+
+
+
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_log.h"
+
+#include "functions.h"
+#include "led_control.h"
+#include "pins_control.h"
+#include "rfid_conf.h"
+#include "cards_control.h"
+#include "rtc_control.h"
+#include "wifi_control.h"
+#include "server_control.h"
+#include "lock_control.h"
+#include "spiffs_control.h"
+
+static const char *tag = "LockStatus";
+
+ 
+
+void app_main(void)
+{
+    uint8_t *data = 0;
+    int8_t counter;
+    time_t time;
+    int wifi_res;
+    int check_card_flag;
+
+    init_spiffs();
+
+    init_pins();
+
+    check_lock_state(); //détecteur de présence
+
+    check_rtc();// pour sync le RTC
+
+    TickType_t start_time = xTaskGetTickCount();
+
+    data = rfid_on();
+
+    if (data != NULL && check_rfid_data((const char *)data))
+    {
+        rfid_off();
+        time = get_time();
+        check_card_flag = check_card((const char *)data);
+
+        read_cards();
+
+        if (check_card_flag == 0)
+        { // Valid Card
+            TURN_GREEN_LED();
+            open_lock();
+            vTaskDelay(pdMS_TO_TICKS(3000));
+            close_lock();
+            TURN_OFF_LED();
+        }
+        else if (check_card_flag == 1)
+        { // Blocked Card
+            TURN_BLUE_LED();
+            vTaskDelay(pdMS_TO_TICKS(400));
+            TURN_OFF_LED();
+        }
+        add_log((const char *)data, (long)time);
+        read_log();
+
+        counter = decrement_counter();
+        printf("Counter = %" PRIu8 "\n", counter);
+
+        if (counter == 0 || check_card_flag == 2)
+        {
+            wifi_res = wifi_connection();
+
+            if (wifi_res == 0)
+            {
+                server_connection();
+                send_to_server("get_cards", "1");
+                vTaskDelay(pdMS_TO_TICKS(300));
+
+                if (check_card_flag == 2)
+                {
+                    read_cards();
+
+                    check_card_flag = check_card((const char *)data);
+                    if (check_card_flag == 0)
+                    { // Valid Card
+                        TURN_GREEN_LED();
+                        open_lock();
+                        vTaskDelay(pdMS_TO_TICKS(3000));
+                        close_lock();
+                        TURN_OFF_LED();
+                    }
+                    else if (check_card_flag == 1)
+                    { // Blocked Card
+                        TURN_BLUE_LED();
+                        vTaskDelay(pdMS_TO_TICKS(400));
+                        TURN_OFF_LED();
+                    }
+                    else
+                    { // Invalid Card
+                        TURN_RED_LED();
+                        vTaskDelay(pdMS_TO_TICKS(200));
+                        TURN_OFF_LED();
+                        vTaskDelay(pdMS_TO_TICKS(200));
+                        TURN_RED_LED();
+                        vTaskDelay(pdMS_TO_TICKS(200));
+                        TURN_OFF_LED();
+                        add_card((const char *)data, time, time, 1, 0, 0);
+                    }
+
+                    add_log((const char *)data, (long)time);
+                }
+            }
+            else
+            {
+                ESP_LOGI(tag, "Wifi is Not Connected");
+            }
+
+            send_log_to_server();
+            server_disconnection();
+            ESP_LOGI(tag, "Disconnected from the server");
+            wifi_disconnection();
+            ESP_LOGI(tag, "Disconnected from the Wi-Fi");
+        }
+    }
+    else
+    {
+        ESP_LOGI(tag, "No RFID data found or invalid");
+    }
+
+    TickType_t end_time = xTaskGetTickCount();
+    TickType_t elapsed_time = end_time - start_time;
+    float time_milliseconds = ((float)elapsed_time * 1000) / configTICK_RATE_HZ;
+    ESP_LOGI(TAG, "Time taken: %.2f milliseconds", time_milliseconds);
+
+    deinit_pins();
+    // vTaskDelay(pdMS_TO_TICKS(2000));
+
+    lock_deep_sleep();
+}

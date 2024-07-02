@@ -1,0 +1,2 @@
+- separate wifi connection from the algorithm ( it will turn on without RFID )
+-

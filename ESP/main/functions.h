@@ -12,12 +12,9 @@
 #include "esp_sleep.h"
 #include "esp32/rtc.h"
 #include <time.h>
-#include "esp_adc/adc_oneshot.h"
-#include "esp_adc/adc_continuous.h"
-#include "esp_adc/adc_cali.h"
-#include "driver/adc.h"
 #include "wifi_control.h"
 #include "server_control.h"
+#include "lock_control.h"
 
 #define BUZZER 21
 
@@ -152,37 +149,5 @@ void deep_sleep_buzzer()
     gpio_set_level(BUZZER, 0);
 }
 
-int get_battery_level()
-{
-    adc1_pad_get_io_num(ADC1_CHANNEL_3, &adc_gpio_num);
-    printf("ADC GPIO number: %d\n", adc_gpio_num);
-
-    adc1_config_width(ADC_WIDTH_BIT_12);
-    adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_0);
-
-    int raw_value = adc1_get_raw(ADC1_CHANNEL_3);
-    printf("Raw ADC reading: %d\n", raw_value);
-
-    return raw_value;
-}
-
-void rtc_sync()
-{
-
-    int wifi_res = wifi_connection();
-
-    if (wifi_res == 0)
-    {
-        server_connection();
-        send_to_server("get_cards", "1");
-        vTaskDelay(pdMS_TO_TICKS(300));
-        server_disconnection();
-        server_connection();
-        send_to_server("get_time", "1");
-        vTaskDelay(pdMS_TO_TICKS(300));
-        server_disconnection();
-        wifi_disconnection();
-    }
-}
 
 #endif /* FUNCTIONS_H */

@@ -1,2 +1,1 @@
-- separate wifi connection from the algorithm ( it will turn on without RFID )
--
+separate wifi connection and disconnection between rtc and sync ( make sure to delete the wifi and mqtt instances)

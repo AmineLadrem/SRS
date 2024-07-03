@@ -4,14 +4,14 @@
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/gen_project_binary.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/app.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/erase_flash.dir
-/home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/uf2.dir
-/home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/uf2-app.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/monitor.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/_project_elf_src.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/bootloader.elf.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/size.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/size-files.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/size-components.dir
+/home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/uf2-app.dir
+/home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/uf2.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/edit_cache.dir
 /home/amineladrem/SRS/ESP/build/bootloader/CMakeFiles/rebuild_cache.dir
 /home/amineladrem/SRS/ESP/build/bootloader/esp-idf/CMakeFiles/edit_cache.dir
@@ -32,9 +32,7 @@
 /home/amineladrem/SRS/ESP/build/bootloader/esp-idf/spi_flash/CMakeFiles/__idf_spi_flash.dir
 /home/amineladrem/SRS/ESP/build/bootloader/esp-idf/spi_flash/CMakeFiles/edit_cache.dir
 /home/amineladrem/SRS/ESP/build/bootloader/esp-idf/spi_flash/CMakeFiles/rebuild_cache.dir
-/home/amineladrem/SRS/ESP/build/bootloader/esp-idf/esp_bootloader_format/CMakeFiles/__idf_esp_bootloader_format.dir
-/home/amineladrem/SRS/ESP/build/bootloader/esp-idf/esp_bootloader_format/CMakeFiles/edit_cache.dir
-/home/amineladrem/SRS/ESP/build/bootloader/esp-idf/esp_bootloader_format/CMakeFiles/rebuild_cache.dir
+/home/amineladrem/SRS/ESP/build/bootloader/esp-idf/esp_app_format/CMakeFiles/__idf_esp_app_format.dir
 /home/amineladrem/SRS/ESP/build/bootloader/esp-idf/esp_app_format/CMakeFiles/edit_cache.dir
 /home/amineladrem/SRS/ESP/build/bootloader/esp-idf/esp_app_format/CMakeFiles/rebuild_cache.dir
 /home/amineladrem/SRS/ESP/build/bootloader/esp-idf/bootloader_support/CMakeFiles/__idf_bootloader_support.dir

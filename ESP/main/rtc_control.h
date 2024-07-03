@@ -43,7 +43,6 @@ int check_rtc(){
     printf("Current time: %lu\n", (unsigned long)now);
 
     if(now<10000){
-        rtc_sync();
         return 0;
     }
     else {

@@ -1,15 +1,14 @@
 /home/amineladrem/SRS/ESP/build/esp-idf/riscv/libriscv.a
 /home/amineladrem/SRS/ESP/build/esp-idf/esp_ringbuf/libesp_ringbuf.a
 /home/amineladrem/SRS/ESP/build/esp-idf/efuse/libefuse.a
-/home/amineladrem/SRS/ESP/build/esp-idf/esp_mm/libesp_mm.a
 /home/amineladrem/SRS/ESP/build/esp-idf/driver/libdriver.a
 /home/amineladrem/SRS/ESP/build/esp-idf/esp_pm/libesp_pm.a
 /home/amineladrem/SRS/ESP/build/esp-idf/mbedtls/libmbedtls.a
-/home/amineladrem/SRS/ESP/build/esp-idf/esp_bootloader_format/libesp_bootloader_format.a
 /home/amineladrem/SRS/ESP/build/esp-idf/esp_app_format/libesp_app_format.a
 /home/amineladrem/SRS/ESP/build/esp-idf/bootloader_support/libbootloader_support.a
 /home/amineladrem/SRS/ESP/build/esp-idf/esp_partition/libesp_partition.a
 /home/amineladrem/SRS/ESP/build/esp-idf/app_update/libapp_update.a
+/home/amineladrem/SRS/ESP/build/esp-idf/esp_mm/libesp_mm.a
 /home/amineladrem/SRS/ESP/build/esp-idf/spi_flash/libspi_flash.a
 /home/amineladrem/SRS/ESP/build/esp-idf/pthread/libpthread.a
 /home/amineladrem/SRS/ESP/build/esp-idf/esp_system/libesp_system.a
@@ -58,7 +57,6 @@
 /home/amineladrem/SRS/ESP/build/esp-idf/ieee802154/libieee802154.a
 /home/amineladrem/SRS/ESP/build/esp-idf/json/libjson.a
 /home/amineladrem/SRS/ESP/build/esp-idf/mqtt/libmqtt.a
-/home/amineladrem/SRS/ESP/build/esp-idf/nvs_sec_provider/libnvs_sec_provider.a
 /home/amineladrem/SRS/ESP/build/esp-idf/spiffs/libspiffs.a
 /home/amineladrem/SRS/ESP/build/esp-idf/wifi_provisioning/libwifi_provisioning.a
 /home/amineladrem/SRS/ESP/build/esp-idf/main/libmain.a

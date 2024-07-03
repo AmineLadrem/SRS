@@ -163,6 +163,8 @@ int server_connection()
     esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
     esp_mqtt_client_start(client);
 
+     vTaskDelay(pdMS_TO_TICKS(200));
+
     return 0;
 }
 

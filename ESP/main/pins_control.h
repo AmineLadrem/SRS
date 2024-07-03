@@ -10,7 +10,7 @@
 #define UART 1
 #define BUZZER 21
 #define RED_LED 18
-#define GREEN_LED 6
+#define ADC_EN 6
 
 #define LOCK_OUT1 19
 #define LOCK_OUT2 20
@@ -41,9 +41,9 @@ int init_pins()
     gpio_set_direction(RED_LED, GPIO_MODE_OUTPUT);
     gpio_set_level(RED_LED, 1);
 
-    gpio_pad_select_gpio(GREEN_LED);
-    gpio_set_direction(GREEN_LED, GPIO_MODE_OUTPUT);
-    gpio_set_level(GREEN_LED, 1);
+    gpio_pad_select_gpio(ADC_EN);
+    gpio_set_direction(ADC_EN, GPIO_MODE_OUTPUT);
+    gpio_set_level(ADC_EN, 0);
 
     gpio_pad_select_gpio(LOCK_OUT1);
     gpio_set_direction(LOCK_OUT1, GPIO_MODE_OUTPUT);
@@ -78,7 +78,7 @@ void deinit_pins()
     gpio_reset_pin(UART);
     gpio_reset_pin(BUZZER);
     gpio_reset_pin(RED_LED);
-    gpio_reset_pin(GREEN_LED);
+    gpio_reset_pin(ADC_EN);
     gpio_reset_pin(LOCK_OUT1);
     gpio_reset_pin(LOCK_OUT2);
 

@@ -49,8 +49,8 @@ int check_capteur_state() {
     return (gpio_get_level(CAPTEUR));
 }
 
-void lock_deep_sleep(){
- esp_sleep_enable_timer_wakeup(2 * 1000000);
+void lock_deep_sleep(float seconds){
+ esp_sleep_enable_timer_wakeup(seconds * 1000000);
     esp_deep_sleep_start();
 }
 

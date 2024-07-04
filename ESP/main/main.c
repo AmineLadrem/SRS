@@ -127,6 +127,7 @@ void app_main(void)
         if (data != NULL && check_rfid_data((const char *)data))
         {
             add_to_log("A card was detected");
+            add_to_log((const char *)data);
             time = get_time();
             check_card_flag = check_card((const char *)data);
             read_cards();
@@ -156,6 +157,8 @@ void app_main(void)
 
             counter = decrement_counter();
             printf("Counter = %" PRIu8 "\n", counter);
+
+            break;
         }
         else
         {

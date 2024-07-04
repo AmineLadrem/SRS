@@ -1,1 +1,3 @@
-separate wifi connection and disconnection between rtc and sync ( make sure to delete the wifi and mqtt instances)
+-separate wifi connection and disconnection between rtc and sync ( make sure to delete the wifi and mqtt instances)
+
+- implement another log which contains : counter of esp boots , esp turn on , flag of card if it was passed or not , battery pourcentage , wifi + server , esp turn off

@@ -1,7 +1,7 @@
 {
     "version":            "1",
     "project_name":       "Final",
-    "project_version":    "6c8641b-dirty",
+    "project_version":    "ac1b944-dirty",
     "project_path":       "/home/amineladrem/SRS/ESP",
     "idf_path":           "/home/amineladrem/esp/v5.1.2/esp-idf",
     "build_dir":          "/home/amineladrem/SRS/ESP/build",
